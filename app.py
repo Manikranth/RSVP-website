@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify
 import os
 import shutil
 import logging
+import traceback 
 from google_sheets import add_rsvp_to_sheet
 
 # Configure logging
@@ -86,6 +87,34 @@ def submit_rsvp():
     except Exception as e:
         logger.exception("Unexpected error in submit_rsvp")
         return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/debug')
+def debug_info():
+    """Route for debugging server information"""
+    try:
+        static_files = os.listdir('static')
+        css_files = os.listdir('static/css') if os.path.exists('static/css') else []
+        js_files = os.listdir('static/js') if os.path.exists('static/js') else []
+        image_files = os.listdir('static/images') if os.path.exists('static/images') else []
+        video_files = os.listdir('static/videos') if os.path.exists('static/videos') else []
+        
+        return jsonify({
+            'success': True,
+            'static_files': static_files,
+            'css_files': css_files,
+            'js_files': js_files,
+            'image_files': image_files,
+            'video_files': video_files,
+            'env': {k: v for k, v in os.environ.items()},
+            'working_dir': os.getcwd()
+        })
+    except Exception as e:
+        logger.exception("Error in debug endpoint")
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'traceback': traceback.format_exc()
+        })
 
 @app.route('/test')
 def test_form():
