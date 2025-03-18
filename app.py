@@ -27,6 +27,26 @@ def index():
         
     return render_template('index.html', family_video='video.mp4')
 
+@app.route('/Sangeet')
+def sangeet_page():
+    # Ensure the videos directory exists
+    if not os.path.exists('static/videos'):
+        os.makedirs('static/videos')
+    
+    # Custom message for the Sangeet page with proper formatting
+    custom_message = {
+        'heading': 'Dance to the beat',
+        'description': "You've asked, so here it is-our red bomb.\n\nAs many of you may already know, we will be tying the knot soon. And we'd like you to join us to celebrate our love together in the beautiful Penang Island!",
+        'custom_date': "April 11th, 2025",
+        'custom_time': "From 5 PM to 10 PM"
+    }
+    
+    # Pass the custom spreadsheet ID for Sangeet RSVPs
+    sangeet_sheet_id = "1Ux3gEGVr6Kg90_yh021nLg6FOzwAlOx9JiBCktOSHTo"
+    
+    return render_template('index.html', family_video='sangeeth.png', is_image=True, 
+                           custom_message=custom_message, sheet_id=sangeet_sheet_id)
+
 @app.route('/Bheemineni')
 def bheemineni_page():
     # Ensure the videos directory exists
@@ -66,6 +86,7 @@ def submit_rsvp():
         
         family_name = data.get('familyName')
         guest_count = data.get('guestCount')
+        sheet_id = data.get('sheetId')  # Get the sheet ID if provided
         
         logger.info(f"Processing RSVP for: {family_name}, Guests: {guest_count}")
         print(f"PROCESSING: {family_name}, {guest_count}")  # Console print for visibility
@@ -77,7 +98,8 @@ def submit_rsvp():
         # Add to Google Sheet - with better error handling
         try:
             logger.info("Attempting to add to Google Sheet")
-            result = add_rsvp_to_sheet(family_name, guest_count)
+            # Pass the sheet_id if provided, otherwise use default
+            result = add_rsvp_to_sheet(family_name, guest_count, sheet_id)
             logger.info(f"Google Sheet result: {result}")
             return jsonify({"success": True})
         except Exception as e:

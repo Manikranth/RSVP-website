@@ -69,8 +69,10 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const familyName = document.getElementById('family-name').value.trim();
             const guestCount = document.getElementById('guest-count').value.trim();
+            // Get the sheet ID if it's available in the page
+            const sheetId = document.querySelector('meta[name="sheet-id"]')?.getAttribute('content') || null;
             
-            console.log(`FORM SUBMIT: Preparing to send RSVP for ${familyName}, ${guestCount} guests`);
+            console.log(`FORM SUBMIT: Preparing to send RSVP for ${familyName}, ${guestCount} guests, Sheet ID: ${sheetId}`);
             
             if (!familyName) {
                 alert('Please enter your full name.');
@@ -94,7 +96,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: JSON.stringify({
                     familyName: familyName,
-                    guestCount: guestCount
+                    guestCount: guestCount,
+                    sheetId: sheetId
                 })
             })
             .then(response => response.text())

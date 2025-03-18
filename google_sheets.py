@@ -14,13 +14,17 @@ SCOPES = [
 ]
 
 # Spreadsheet details
-SPREADSHEET_ID = '1zlnCo2WRxWDxCnbditnx5tAylcmXrI2w0gCDyq5bjXg'
+DEFAULT_SPREADSHEET_ID = '1zlnCo2WRxWDxCnbditnx5tAylcmXrI2w0gCDyq5bjXg'
 SHEET_NAME = 'Sheet1'
 
-def add_rsvp_to_sheet(family_name, guest_count):
+def add_rsvp_to_sheet(family_name, guest_count, custom_sheet_id=None):
     """Adds RSVP information to Google Sheet using gspread."""
     try:
         logger.info(f"Adding RSVP for {family_name} with {guest_count} guests")
+        
+        # Use custom sheet ID if provided, otherwise use default
+        spreadsheet_id = custom_sheet_id if custom_sheet_id else DEFAULT_SPREADSHEET_ID
+        logger.info(f"Using spreadsheet ID: {spreadsheet_id}")
         
         # Load credentials and authorize gspread
         creds = Credentials.from_service_account_file(
@@ -39,12 +43,12 @@ def add_rsvp_to_sheet(family_name, guest_count):
             logger.error(f"ERROR listing spreadsheets: {str(e)}")
         
         # Open the spreadsheet by ID
-        logger.info(f"Opening spreadsheet with ID: {SPREADSHEET_ID}")
+        logger.info(f"Opening spreadsheet with ID: {spreadsheet_id}")
         try:
-            spreadsheet = client.open_by_key(SPREADSHEET_ID)
+            spreadsheet = client.open_by_key(spreadsheet_id)
             logger.info(f"Successfully opened spreadsheet: {spreadsheet.title}")
         except gspread.exceptions.SpreadsheetNotFound:
-            logger.error(f"ERROR: Spreadsheet with ID {SPREADSHEET_ID} not found!")
+            logger.error(f"ERROR: Spreadsheet with ID {spreadsheet_id} not found!")
             return {"success": False, "error": "Spreadsheet not found"}
         except Exception as e:
             logger.error(f"ERROR opening spreadsheet: {str(e)}")

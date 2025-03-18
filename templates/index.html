@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    {% if sheet_id %}
+    <meta name="sheet-id" content="{{ sheet_id }}">
+    {% endif %}
     <title>wedding RSVP</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,600&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
@@ -10,11 +13,14 @@
 </head>
 <body>
     <div class="full-width-video-container">
+        {% if is_image %}
+        <img id="wedding-image" src="{{ url_for('static', filename='videos/' + family_video) }}" alt="Wedding Celebration">
+        {% else %}
         <video id="wedding-video" autoplay muted playsinline>
             <source src="{{ url_for('static', filename='videos/' + (family_video or 'video.mp4')) }}" type="video/mp4">
             Your browser does not support the video tag.
         </video>
-        <!-- Tap for sound animation -->
+        <!-- Tap for sound animation - only show for videos -->
         <div id="tap-animation" class="tap-for-sound-animation">
             <div class="tap-circles">
                 <span class="circle circle-1"></span>
@@ -23,25 +29,49 @@
             </div>
             <p>Tap for sound</p>
         </div>
+        {% endif %}
     </div>
     
     <div class="container">
         <div class="couple-header">
-            <p class="wedding-date-display">April 13th, 2025</p>
+            {% if custom_message and custom_message.custom_date %}
+                <p class="wedding-date-display">{{ custom_message.custom_date }}</p>
+            {% else %}
+                <p class="wedding-date-display">April 13th, 2025</p>
+            {% endif %}
         </div>
         
         <div class="save-the-date-section">
-            <h1 class="save-date-heading">Save the Date<span class="dot">.</span></h1>
+            {% if custom_message and custom_message.heading %}
+                <h1 class="save-date-heading">{{ custom_message.heading }}<span class="dot">.</span></h1>
+            {% else %}
+                <h1 class="save-date-heading">Save the Date<span class="dot">.</span></h1>
+            {% endif %}
             
-            <p class="intro-text">Exciting News – A Special Celebration Awaits!</p>
-            
-            <p class="save-date-message">
-                We are thrilled to share that Supraj and Charunya will soon be tying the knot! We would love for you to join us in celebrating this joyous occasion in <span class="venue-highlight">Pilot Point, Texas</span>!
-            </p>
-            
-            <p class="rsvp-message">
-                If you could make it to our big day, please fill in your details below so we can reserve a great seat for you. <span class="emoji">😀</span>
-            </p>
+            {% if custom_message %}
+                {% if custom_message.title is defined %}
+                <p class="intro-text">{{ custom_message.title }}</p>
+                {% endif %}
+                
+                <p class="save-date-message">
+                    {{ custom_message.description|replace('\n', '<br>')|safe }}
+                </p>
+                
+                <!-- Custom RSVP message only for Sangeet page -->
+                <p class="rsvp-message">
+                    If you could make it to our big day, please fill in your details below so we can reserve a great seat for you. <span class="emoji">😀</span>
+                </p>
+            {% else %}
+                <p class="intro-text">Exciting News – A Special Celebration Awaits!</p>
+                
+                <p class="save-date-message">
+                    We are thrilled to share that Supraj and Charunya will soon be tying the knot! We would love for you to join us in celebrating this joyous occasion in <span class="venue-highlight">Pilot Point, Texas</span>!
+                </p>
+                
+                <p class="rsvp-message">
+                    If you could make it to our big day, please fill in your details below so we can reserve a great seat for you. <span class="emoji">😀</span>
+                </p>
+            {% endif %}
             
             <button id="rsvp-btn" class="definitely-in-btn">I'M DEFINITELY IN</button>
         </div>
@@ -54,13 +84,21 @@
             <div class="event-details-grid">
                 <div class="detail-section">
                     <h3 class="detail-label">Date</h3>
+                    {% if custom_message and custom_message.custom_date %}
+                        <p class="detail-info">{{ custom_message.custom_date }} {% if custom_message.custom_date == "April 11th, 2025" %}(Friday){% else %}(Sunday){% endif %}</p>
+                    {% else %}
                     <p class="detail-info">April 13th, 2025 (Sunday)</p>
+                    {% endif %}
                 </div>
                 
                 <div class="detail-section">
                     <h3 class="detail-label">Time</h3>
-                    <p class="detail-info">From - 08:00 AM</p>
-                    <p class="detail-info">Followed by Launch - 11:30 AM</p>
+                    {% if custom_message and custom_message.custom_time %}
+                        <p class="detail-info">{{ custom_message.custom_time }}</p>
+                    {% else %}
+                        <p class="detail-info">From - 08:00 AM</p>
+                        <p class="detail-info">Followed by Launch - 11:30 AM</p>
+                    {% endif %}
                 </div>
                 
                 <div class="detail-section">
@@ -70,7 +108,8 @@
                     </p>
                 </div>
                 
-                <!-- New Livestream section -->
+                <!-- New Livestream section - hide for Sangeet page -->
+                {% if not (custom_message and custom_message.heading == 'Dance to the beat') %}
                 <div class="detail-section">
                     <h3 class="detail-label">Livestream</h3>
                     <p class="detail-info livestream-link">
@@ -78,7 +117,7 @@
                     </p>
                 </div>
                 
-                <!-- New Countdown timer section -->
+                <!-- New Countdown timer section - hide for Sangeet page -->
                 <div class="detail-section countdown-section">
                     <h3 class="detail-label">Countdown</h3>
                     <div id="countdown-timer" class="countdown-display">
@@ -100,6 +139,7 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
             </div>
         </div>
         

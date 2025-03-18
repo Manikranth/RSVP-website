@@ -995,4 +995,31 @@ html, body {
     .countdown-item {
         min-width: 70px;
     }
+}
+
+/* Add these styles for the wedding image */
+#wedding-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    max-width: 500px;
+    margin: 0 auto;
+    object-fit: contain;
+}
+
+/* Media queries for the wedding image */
+@media (min-width: 769px) {
+    #wedding-image {
+        max-height: 80vh;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+}
+
+@media (max-width: 768px) {
+    #wedding-image {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+    }
 } 
