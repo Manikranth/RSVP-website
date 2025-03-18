@@ -81,4 +81,53 @@ def add_rsvp_to_sheet(family_name, guest_count, custom_sheet_id=None):
             
     except Exception as e:
         logger.exception(f"ERROR in add_rsvp_to_sheet: {str(e)}")
-        return {"success": False, "error": str(e)} 
+        return {"success": False, "error": str(e)}
+
+def get_guest_list(sheet_id=None):
+    """Fetches the guest list from the specified Google Sheet."""
+    try:
+        # Use default sheet ID if none provided
+        spreadsheet_id = sheet_id if sheet_id else DEFAULT_SPREADSHEET_ID
+        logger.info(f"Fetching guest list from spreadsheet ID: {spreadsheet_id}")
+        
+        # Load credentials and authorize gspread
+        creds = Credentials.from_service_account_file(
+            "credentials.json", 
+            scopes=SCOPES
+        )
+        client = gspread.authorize(creds)
+        
+        # Open the spreadsheet
+        spreadsheet = client.open_by_key(spreadsheet_id)
+        sheet = spreadsheet.worksheet(SHEET_NAME)
+        
+        # Get all values
+        all_values = sheet.get_all_values()
+        
+        # Remove header if exists (first row)
+        if len(all_values) > 0:
+            records = all_values[1:] if len(all_values) > 1 else []
+        else:
+            records = []
+            
+        logger.info(f"Retrieved {len(records)} guest records")
+        
+        # Calculate total guest count - assuming guest count is in second column
+        total_guests = 0
+        for record in records:
+            if len(record) > 1 and record[1].isdigit():
+                total_guests += int(record[1])
+        
+        return {
+            "success": True,
+            "records": records,
+            "total_guests": total_guests
+        }
+    except Exception as e:
+        logger.exception(f"Error fetching guest list: {str(e)}")
+        return {
+            "success": False,
+            "error": str(e),
+            "records": [],
+            "total_guests": 0
+        } 

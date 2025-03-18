@@ -3,7 +3,7 @@ import os
 import shutil
 import logging
 import traceback 
-from google_sheets import add_rsvp_to_sheet
+from google_sheets import add_rsvp_to_sheet, get_guest_list
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(name)s - %(message)s')
@@ -36,7 +36,7 @@ def sangeet_page():
     # Custom message for the Sangeet page with proper formatting
     custom_message = {
         'heading': 'Dance to the beat',
-        'description': "You've asked, so here it is-our red bomb.\n\nAs many of you may already know, we will be tying the knot soon. And we'd like you to join us to celebrate our love together in the beautiful Penang Island!",
+        'description': "You've asked, so here it is-rhythm of the life.\n\nBefore we tie the knot, let's celebrate with a night full of music, dance, and unforgettable moments! Join us for an evening of joy, laughter, and dazzling performances in Pilot Point, Texas!!",
         'custom_date': "April 11th, 2025",
         'custom_time': "From 5 PM to 10 PM"
     }
@@ -141,6 +141,29 @@ def debug_info():
 @app.route('/test')
 def test_form():
     return open('test_form.html').read()
+
+@app.route('/guest-list')
+def guest_list():
+    """Display the guest lists for both Wedding and Sangeet events."""
+    # Define both sheet IDs
+    wedding_sheet_id = '1zlnCo2WRxWDxCnbditnx5tAylcmXrI2w0gCDyq5bjXg'
+    sangeet_sheet_id = '1Ux3gEGVr6Kg90_yh021nLg6FOzwAlOx9JiBCktOSHTo'
+    
+    # Get data for both sheets
+    try:
+        wedding_data = get_guest_list(wedding_sheet_id)
+        sangeet_data = get_guest_list(sangeet_sheet_id)
+        
+        return render_template(
+            'guest_list.html',
+            wedding_data=wedding_data,
+            sangeet_data=sangeet_data,
+            wedding_sheet_id=wedding_sheet_id,
+            sangeet_sheet_id=sangeet_sheet_id
+        )
+    except Exception as e:
+        logger.exception(f"Error in guest list page: {str(e)}")
+        return f"Error loading guest lists: {str(e)}", 500
 
 if __name__ == '__main__':
     logger.info("Starting the Flask application")

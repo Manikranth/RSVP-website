@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wedding Guest Lists</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,600&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Additional styles for guest list page */
+        .guest-list-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            font-family: 'Playfair Display', serif;
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .event-selector {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .event-selector select {
+            padding: 10px 20px;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: white;
+            cursor: pointer;
+        }
+        
+        .summary-box {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+        
+        .stat-card {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            text-align: center;
+            width: 48%;
+        }
+        
+        .stat-card h3 {
+            margin-top: 0;
+            color: #666;
+            font-size: 1rem;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #7b1d2f;
+            margin: 10px 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            border: 1px solid #eee;
+            padding: 12px 15px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f5f5f5;
+            font-weight: 600;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .no-guests-message {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+        }
+        
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 30px;
+            color: #7b1d2f;
+            text-decoration: none;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="guest-list-container">
+        <h1>Guest Lists</h1>
+        
+        <div class="event-selector">
+            <select id="event-dropdown">
+                <option value="wedding">Wedding Guest List</option>
+                <option value="sangeet">Sangeet Guest List</option>
+            </select>
+        </div>
+        
+        <div id="wedding-guests" class="guest-list">
+            <div class="summary-box">
+                <div class="stat-card">
+                    <h3>Total Number of Guests</h3>
+                    <div class="stat-number">{{ wedding_data.total_guests }}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Number of RSVPs</h3>
+                    <div class="stat-number">{{ wedding_data.records|length }}</div>
+                </div>
+            </div>
+            
+            {% if wedding_data.records %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Number of Guests</th>
+                            <th>RSVP Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in wedding_data.records %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ record[0] }}</td>
+                                <td>{{ record[1] }}</td>
+                                <td>{{ record[2] }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="no-guests-message">
+                    <p>No wedding guests have RSVP'd yet.</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div id="sangeet-guests" class="guest-list" style="display: none;">
+            <div class="summary-box">
+                <div class="stat-card">
+                    <h3>Total Number of Guests</h3>
+                    <div class="stat-number">{{ sangeet_data.total_guests }}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Number of RSVPs</h3>
+                    <div class="stat-number">{{ sangeet_data.records|length }}</div>
+                </div>
+            </div>
+            
+            {% if sangeet_data.records %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Number of Guests</th>
+                            <th>RSVP Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in sangeet_data.records %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ record[0] }}</td>
+                                <td>{{ record[1] }}</td>
+                                <td>{{ record[2] }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="no-guests-message">
+                    <p>No Sangeet guests have RSVP'd yet.</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <a href="/" class="back-link">Back to Wedding Page</a>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get elements
+            const dropdown = document.getElementById('event-dropdown');
+            const weddingSection = document.getElementById('wedding-guests');
+            const sangeetSection = document.getElementById('sangeet-guests');
+            
+            // Handle dropdown change
+            dropdown.addEventListener('change', function() {
+                if (this.value === 'wedding') {
+                    weddingSection.style.display = 'block';
+                    sangeetSection.style.display = 'none';
+                } else {
+                    weddingSection.style.display = 'none';
+                    sangeetSection.style.display = 'block';
+                }
+            });
+        });
+    </script>
+</body>
+</html> 
