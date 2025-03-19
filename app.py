@@ -38,7 +38,9 @@ def sangeet_page():
         'heading': 'Dance to the beat',
         'description': "You've asked, so here it is-rhythm of the life.\n\nBefore we tie the knot, let's celebrate with a night full of music, dance, and unforgettable moments! Join us for an evening of joy, laughter, and dazzling performances in Pilot Point, Texas!!",
         'custom_date': "April 11th, 2025",
-        'custom_time': "From 5 PM to 10 PM"
+        'custom_time': "From 5 PM to 10 PM",
+        'custom_dinner_time': "Dinner 7:00 PM",
+        'custom_rsvp_message': "If you can make it to our Sangeet, please fill in your details below so we can reserve a spot for you on the dance floor. 🎶💃🕺"
     }
     
     # Pass the custom spreadsheet ID for Sangeet RSVPs

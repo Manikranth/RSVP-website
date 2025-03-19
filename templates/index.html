@@ -59,7 +59,11 @@
                 
                 <!-- Custom RSVP message only for Sangeet page -->
                 <p class="rsvp-message">
-                    If you could make it to our big day, please fill in your details below so we can reserve a great seat for you. <span class="emoji">😀</span>
+                    {% if custom_message and custom_message.custom_rsvp_message %}
+                        {{ custom_message.custom_rsvp_message }}
+                    {% else %}
+                        If you could make it to our big day, please fill in your details below so we can reserve a great seat for you. <span class="emoji">😀</span>
+                    {% endif %}
                 </p>
             {% else %}
                 <p class="intro-text">Exciting News – A Special Celebration Awaits!</p>
@@ -100,6 +104,13 @@
                         <p class="detail-info">Followed by Launch - 11:30 AM</p>
                     {% endif %}
                 </div>
+                
+                {% if custom_message and custom_message.custom_dinner_time %}
+                <div class="detail-section">
+                    <h3 class="detail-label">Dinner</h3>
+                    <p class="detail-info">7:00 PM</p>
+                </div>
+                {% endif %}
                 
                 <div class="detail-section">
                     <h3 class="detail-label">Venue</h3>
