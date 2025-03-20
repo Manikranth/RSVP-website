@@ -68,13 +68,13 @@ def siddana_page():
 @app.route('/submit_rsvp', methods=['POST'])
 def submit_rsvp():
     try:
-        print("======== RSVP SUBMISSION RECEIVED ========")  # Console print for visibility
+        print("======== RSVP SUBMISSION RECEIVED ========")
         logger.info("======== RSVP SUBMISSION RECEIVED ========")
         
         # Debug raw request
         logger.debug(f"Request content type: {request.content_type}")
         logger.debug(f"Request data: {request.data}")
-        print(f"REQUEST DATA: {request.data}")  # Console print for visibility
+        print(f"REQUEST DATA: {request.data}")
         
         data = request.get_json()
         
@@ -84,18 +84,33 @@ def submit_rsvp():
             return jsonify({"success": False, "error": "No data provided"}), 400
         
         logger.debug(f"Parsed JSON data: {data}")
-        print(f"PARSED JSON: {data}")  # Console print for visibility
+        print(f"PARSED JSON: {data}")
         
         family_name = data.get('familyName')
         guest_count = data.get('guestCount')
-        sheet_id = data.get('sheetId')  # Get the sheet ID if provided
+        sheet_id = data.get('sheetId')
         
         logger.info(f"Processing RSVP for: {family_name}, Guests: {guest_count}")
-        print(f"PROCESSING: {family_name}, {guest_count}")  # Console print for visibility
+        print(f"PROCESSING: {family_name}, {guest_count}")
         
         if not family_name or not guest_count:
             logger.error("Missing required fields")
             return jsonify({"success": False, "error": "Missing required fields"}), 400
+        
+        # Print the contents of credentials.json (without sensitive data)
+        try:
+            import json
+            with open('credentials.json', 'r') as f:
+                creds = json.load(f)
+                # Print metadata without revealing private keys
+                print(f"Credentials file contains keys: {list(creds.keys())}")
+                print(f"Project ID: {creds.get('project_id')}")
+                print(f"Client Email: {creds.get('client_email')}")
+                # Check if file is properly formatted JSON
+                print(f"Credentials file is valid JSON: {bool(creds)}")
+        except Exception as e:
+            print(f"ERROR reading credentials file: {str(e)}")
+            return jsonify({"success": False, "error": f"Credentials file error: {str(e)}"}), 500
         
         # Add to Google Sheet - with better error handling
         try:
@@ -103,7 +118,8 @@ def submit_rsvp():
             # Pass the sheet_id if provided, otherwise use default
             result = add_rsvp_to_sheet(family_name, guest_count, sheet_id)
             logger.info(f"Google Sheet result: {result}")
-            return jsonify({"success": True})
+            return jsonify({"success": True if result.get('success') else False, 
+                           "error": result.get('error', None)})
         except Exception as e:
             logger.exception("Error adding to Google Sheet")
             return jsonify({"success": False, "error": f"Google Sheets error: {str(e)}"}), 500
